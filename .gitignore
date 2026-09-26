@@ -1,4 +1,6 @@
 node_modules/
+.automate/
+automate.config.ts
 .env
 .env.*
 !.env.example
