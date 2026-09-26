@@ -7,10 +7,26 @@ export default automation(
   "Assign an onboarding deal to the Calendly round-robin host",
   {
     parameters: [
-      { label: "Calendly organization URL", name: "calendlyOrganizationUri", type: "url" },
-      { label: "Round-robin event type URL", name: "roundRobinEventTypeUri", type: "url" },
-      { label: "Eligible HubSpot deal stage ID", name: "eligibleDealStageId", type: "text" },
-      { label: "Slack review conversation ID", name: "reviewConversationId", type: "text" },
+      {
+        label: "Calendly organization URL",
+        name: "calendlyOrganizationUri",
+        type: "url",
+      },
+      {
+        label: "Round-robin event type URL",
+        name: "roundRobinEventTypeUri",
+        type: "url",
+      },
+      {
+        label: "Eligible HubSpot deal stage ID",
+        name: "eligibleDealStageId",
+        type: "text",
+      },
+      {
+        label: "Slack review conversation ID",
+        name: "reviewConversationId",
+        type: "text",
+      },
     ],
   },
   ({ parameters }) => {
@@ -21,7 +37,8 @@ export default automation(
       })
       .filter(
         ({ payload }) =>
-          payload.scheduledEvent.eventType === parameters.roundRobinEventTypeUri,
+          payload.scheduledEvent.eventType ===
+          parameters.roundRobinEventTypeUri,
       )
 
     const needsHostReview = booking.filter(
@@ -33,11 +50,12 @@ export default automation(
     })
 
     const hostReference = booking
-      .filter(({ payload }) => payload.scheduledEvent.eventMemberships.length === 1)
+      .filter(
+        ({ payload }) => payload.scheduledEvent.eventMemberships.length === 1,
+      )
       .transform(({ payload }) => ({
-        hostUserId: payload.scheduledEvent.eventMemberships[0]!.user
-          .split("/")
-          .at(-1)!,
+        hostUserId:
+          payload.scheduledEvent.eventMemberships[0]!.user.split("/").at(-1)!,
         inviteeEmail: payload.email,
         bookingUrl: payload.scheduledEvent.uri,
       }))
@@ -48,11 +66,14 @@ export default automation(
       bookingUrl: bookingDetails.bookingUrl,
     }))
 
-    const owners = withPrerequisites(host, () => hubspot.listOwners({ limit: 500 }))
+    const owners = withPrerequisites(host, () =>
+      hubspot.listOwners({ limit: 500 }),
+    )
     const ownerMatch = owners.transform(host, (page, booked) => ({
       ...booked,
       matchingOwners: page.owners.filter(
-        (owner) => owner.email?.toLowerCase() === booked.hostEmail.toLowerCase(),
+        (owner) =>
+          owner.email?.toLowerCase() === booked.hostEmail.toLowerCase(),
       ),
       hasMoreOwners: page.after !== undefined,
     }))
@@ -91,11 +112,14 @@ export default automation(
       ],
       limit: 2,
     })
-    const contactMatch = contactSearch.transform(resolvedOwner, (page, resolved) => ({
-      ...resolved,
-      matchingContacts: page.records,
-      hasMoreContacts: page.pageInfo.after !== undefined,
-    }))
+    const contactMatch = contactSearch.transform(
+      resolvedOwner,
+      (page, resolved) => ({
+        ...resolved,
+        matchingContacts: page.records,
+        hasMoreContacts: page.pageInfo.after !== undefined,
+      }),
+    )
     const unresolvedContact = contactMatch.filter(
       ({ matchingContacts, hasMoreContacts }) =>
         matchingContacts.length !== 1 || hasMoreContacts,
