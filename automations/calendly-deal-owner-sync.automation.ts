@@ -46,7 +46,9 @@ export default automation(
     )
     slack.sendMessage({
       conversation: parameters.reviewConversationId,
-      text: t`Review Calendly booking ${needsHostReview.payload.scheduledEvent.uri}: exactly one booked host is required before updating a HubSpot deal owner.`,
+      text: t`Review Calendly booking ${needsHostReview.payload.scheduledEvent.uri}: exactly one booked host is required before updating a HubSpot deal owner.`.transform(
+        escapeSlackText,
+      ),
     })
 
     const hostReference = booking
@@ -83,7 +85,9 @@ export default automation(
     )
     slack.sendMessage({
       conversation: parameters.reviewConversationId,
-      text: t`Review Calendly booking ${unresolvedOwner.bookingUrl}: host ${unresolvedOwner.hostEmail} did not map to exactly one HubSpot owner in the complete owner list. No deal was changed.`,
+      text: t`Review Calendly booking ${unresolvedOwner.bookingUrl}: host ${unresolvedOwner.hostEmail} did not map to exactly one HubSpot owner in the complete owner list. No deal was changed.`.transform(
+        escapeSlackText,
+      ),
     })
 
     const resolvedOwner = ownerMatch
@@ -126,7 +130,9 @@ export default automation(
     )
     slack.sendMessage({
       conversation: parameters.reviewConversationId,
-      text: t`Review Calendly booking ${unresolvedContact.bookingUrl}: invitee ${unresolvedContact.inviteeEmail} did not match exactly one HubSpot contact. No deal was changed.`,
+      text: t`Review Calendly booking ${unresolvedContact.bookingUrl}: invitee ${unresolvedContact.inviteeEmail} did not match exactly one HubSpot contact. No deal was changed.`.transform(
+        escapeSlackText,
+      ),
     })
 
     const resolvedContact = contactMatch
@@ -157,7 +163,9 @@ export default automation(
     )
     slack.sendMessage({
       conversation: parameters.reviewConversationId,
-      text: t`Review Calendly booking ${unresolvedDeal.bookingUrl}: HubSpot contact ${unresolvedDeal.contactId} has no associated deals or has too many to check safely in one response. No owner was changed.`,
+      text: t`Review Calendly booking ${unresolvedDeal.bookingUrl}: HubSpot contact ${unresolvedDeal.contactId} has no associated deals or has too many to check safely in one response. No owner was changed.`.transform(
+        escapeSlackText,
+      ),
     })
 
     const boundedDeals = dealMatch.filter(
@@ -184,7 +192,9 @@ export default automation(
     )
     slack.sendMessage({
       conversation: parameters.reviewConversationId,
-      text: t`Review Calendly booking ${ambiguous.bookingUrl}: ${ambiguous.eligibleDealIds.transform((ids) => ids.length)} associated HubSpot deals are in the configured eligible stage. Exactly one is required; no owner was changed.`,
+      text: t`Review Calendly booking ${ambiguous.bookingUrl}: ${ambiguous.eligibleDealIds.transform((ids) => ids.length)} associated HubSpot deals are in the configured eligible stage. Exactly one is required; no owner was changed.`.transform(
+        escapeSlackText,
+      ),
     })
 
     const eligible = eligibility.filter(
@@ -196,3 +206,11 @@ export default automation(
     })
   },
 )
+
+/** Keeps provider text from becoming Slack mentions or control markup. */
+function escapeSlackText(text: string) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+}
