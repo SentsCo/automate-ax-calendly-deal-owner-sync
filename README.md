@@ -17,6 +17,8 @@ You'll choose:
 - A Slack channel for bookings that need a human review.
 - Account authorization for Calendly, HubSpot, and Slack.
 
+The agent builds the automation, helps you find the event type and deal stage, and opens account authorization during deployment. You do not need to set up a webhook yourself.
+
 ## Manual setup
 
 If you prefer to set it up yourself:
