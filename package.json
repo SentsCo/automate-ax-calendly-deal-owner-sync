@@ -1,0 +1,15 @@
+{
+  "name": "automate-ax-calendly-deal-owner-sync",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "automate.ax": "^0.160.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@typescript/native": "npm:typescript@^7.0.2"
+  }
+}
